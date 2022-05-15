@@ -13,13 +13,13 @@ import {
 } from '@mui/material';
 import Image from 'next/image';
 import NextLink from 'next/link';
-import { useEffect, useState, useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { useSnackbar } from 'notistack';
 import Layout from '../../components/Layout';
 import classes from '../../utils/classes';
-import { useSnackbar } from 'notistack';
-import Store from '../../utils/Store';
 import client from '../../utils/client';
 import { urlFor, urlForThumbnail } from '../../utils/image';
+import { Store } from '../../utils/Store';
 import axios from 'axios';
 
 export default function ProductScreen(props) {
@@ -28,9 +28,7 @@ export default function ProductScreen(props) {
     state: { cart },
     dispatch,
   } = useContext(Store);
-
   const { enqueueSnackbar } = useSnackbar();
-
   const [state, setState] = useState({
     product: null,
     loading: true,
@@ -51,14 +49,14 @@ export default function ProductScreen(props) {
       }
     };
     fetchData();
-  });
+  }, []);
 
   const addToCartHandler = async () => {
-    const existItem = cart.cartItems.find((x) => x._id === product.id);
+    const existItem = cart.cartItems.find((x) => x._id === product._id);
     const quantity = existItem ? existItem.quantity + 1 : 1;
     const { data } = await axios.get(`/api/products/${product._id}`);
     if (data.countInStock < quantity) {
-      enqueueSnackbar('Sorry. Product is out of stock.', { variant: 'error' });
+      enqueueSnackbar('Sorry. Product is out of stock', { variant: 'error' });
       return;
     }
     dispatch({
@@ -66,7 +64,7 @@ export default function ProductScreen(props) {
       payload: {
         _key: product._id,
         name: product.name,
-        countInSock: product.countInSock,
+        countInStock: product.countInStock,
         slug: product.slug.current,
         price: product.price,
         image: urlForThumbnail(product.image),
@@ -77,7 +75,6 @@ export default function ProductScreen(props) {
       variant: 'success',
     });
   };
-
   return (
     <Layout title={product?.title}>
       {loading ? (
@@ -101,7 +98,6 @@ export default function ProductScreen(props) {
                 layout="responsive"
                 width={640}
                 height={640}
-                priority
               />
             </Grid>
             <Grid item md={3} xs={12}>
