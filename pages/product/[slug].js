@@ -41,7 +41,7 @@ export default function ProductScreen(props) {
       }
     };
     fetchData();
-  }, []);
+  });
 
   return (
     <Layout title={product?.title}>
