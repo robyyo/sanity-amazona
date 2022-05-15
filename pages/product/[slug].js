@@ -13,14 +13,24 @@ import {
 } from '@mui/material';
 import Image from 'next/image';
 import NextLink from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import Layout from '../../components/Layout';
 import classes from '../../utils/classes';
+import { useSnackbar } from 'notistack';
+import Store from '../../utils/Store';
 import client from '../../utils/client';
-import { urlFor } from '../../utils/image';
+import { urlFor, urlForThumbnail } from '../../utils/image';
+import axios from 'axios';
 
 export default function ProductScreen(props) {
   const { slug } = props;
+  const {
+    state: { cart },
+    dispatch,
+  } = useContext(Store);
+
+  const { enqueueSnackbar } = useSnackbar();
+
   const [state, setState] = useState({
     product: null,
     loading: true,
@@ -42,6 +52,31 @@ export default function ProductScreen(props) {
     };
     fetchData();
   });
+
+  const addToCartHandler = async () => {
+    const existItem = cart.cartItems.find((x) => x._id === product.id);
+    const quantity = existItem ? existItem.quantity + 1 : 1;
+    const { data } = await axios.get(`/api/products/${product._id}`);
+    if (data.countInStock < quantity) {
+      enqueueSnackbar('Sorry. Product is out of stock.', { variant: 'error' });
+      return;
+    }
+    dispatch({
+      type: 'CART_ADD_ITEM',
+      payload: {
+        _key: product._id,
+        name: product.name,
+        countInSock: product.countInSock,
+        slug: product.slug.current,
+        price: product.price,
+        image: urlForThumbnail(product.image),
+        quantity,
+      },
+    });
+    enqueueSnackbar(`${product.name} added to the cart`, {
+      variant: 'success',
+    });
+  };
 
   return (
     <Layout title={product?.title}>
@@ -117,7 +152,11 @@ export default function ProductScreen(props) {
                     </Grid>
                   </ListItem>
                   <ListItem>
-                    <Button fullWidth variant="contained">
+                    <Button
+                      onClick={addToCartHandler}
+                      fullWidth
+                      variant="contained"
+                    >
                       Add to cart
                     </Button>
                   </ListItem>
