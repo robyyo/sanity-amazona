@@ -11,12 +11,12 @@ import {
   Rating,
   Typography,
 } from '@mui/material';
+import Image from 'next/image';
+import NextLink from 'next/link';
 import { useEffect, useState } from 'react';
 import Layout from '../../components/Layout';
-import client from '../../utils/client';
-import NextLink from 'next/link';
 import classes from '../../utils/classes';
-import Image from 'next/image';
+import client from '../../utils/client';
 import { urlFor } from '../../utils/image';
 
 export default function ProductScreen(props) {
@@ -26,15 +26,13 @@ export default function ProductScreen(props) {
     loading: true,
     error: '',
   });
-
-  const { product, laoding, error } = state;
-
+  const { product, loading, error } = state;
   useEffect(() => {
     const fetchData = async () => {
       try {
         const product = await client.fetch(
           `
-          *[_type == "product" && slug.current == $slug][0]`,
+            *[_type == "product" && slug.current == $slug][0]`,
           { slug }
         );
         setState({ ...state, product, loading: false });
@@ -47,7 +45,7 @@ export default function ProductScreen(props) {
 
   return (
     <Layout title={product?.title}>
-      {laoding ? (
+      {loading ? (
         <CircularProgress />
       ) : error ? (
         <Alert variant="error">{error}</Alert>
@@ -56,7 +54,7 @@ export default function ProductScreen(props) {
           <Box sx={classes.section}>
             <NextLink href="/" passHref>
               <Link>
-                <Typography>back to results</Typography>
+                <Typography>back to result</Typography>
               </Link>
             </NextLink>
           </Box>
@@ -68,9 +66,10 @@ export default function ProductScreen(props) {
                 layout="responsive"
                 width={640}
                 height={640}
+                priority
               />
             </Grid>
-            <Grid md={3} xs={12}>
+            <Grid item md={3} xs={12}>
               <List>
                 <ListItem>
                   <Typography component="h1" variant="h1">
@@ -85,7 +84,9 @@ export default function ProductScreen(props) {
                     ({product.numReviews} reviews)
                   </Typography>
                 </ListItem>
-                <ListItem>Description: {product.description}</ListItem>
+                <ListItem>
+                  <Typography>Description: {product.description}</Typography>
+                </ListItem>
               </List>
             </Grid>
             <Grid item md={3} xs={12}>
@@ -109,7 +110,7 @@ export default function ProductScreen(props) {
                       <Grid item xs={6}>
                         <Typography>
                           {product.countInStock > 0
-                            ? 'In Stock'
+                            ? 'In stock'
                             : 'Unavailable'}
                         </Typography>
                       </Grid>
