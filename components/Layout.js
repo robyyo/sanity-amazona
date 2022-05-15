@@ -1,26 +1,25 @@
-import React, { useContext } from 'react';
+import { createTheme } from '@mui/material/styles';
 import {
   AppBar,
   Box,
-  Link,
-  Toolbar,
   Container,
-  createTheme,
   CssBaseline,
-  ThemeProvider,
-  Typography,
+  Link,
   Switch,
+  ThemeProvider,
+  Toolbar,
+  Typography,
 } from '@mui/material';
 import Head from 'next/head';
 import NextLink from 'next/link';
 import classes from '../utils/classes';
-import Store from '../utils/Store';
+import { useContext } from 'react';
+import { Store } from '../utils/Store';
 import jsCookie from 'js-cookie';
 
 export default function Layout({ title, description, children }) {
   const { state, dispatch } = useContext(Store);
   const { darkMode } = state;
-
   const theme = createTheme({
     components: {
       MuiLink: {
@@ -51,13 +50,11 @@ export default function Layout({ title, description, children }) {
       },
     },
   });
-
   const darkModeChangeHandler = () => {
-    dispatch({type: darkMode? 'DARK_MODE_OFF':'DARK_MODE_ON'});
+    dispatch({ type: darkMode ? 'DARK_MODE_OFF' : 'DARK_MODE_ON' });
     const newDarkMode = !darkMode;
-    jsCookie.set('darkMode', newDarkMode? 'ON':'OFF')
-  }
-
+    jsCookie.set('darkMode', newDarkMode ? 'ON' : 'OFF');
+  };
   return (
     <>
       <Head>
@@ -87,7 +84,7 @@ export default function Layout({ title, description, children }) {
           {children}
         </Container>
         <Box component="footer" sx={classes.footer}>
-          <Typography>All rights reserved. Sanity Amazona</Typography>
+          <Typography>All rights reserved. Sanity Amazona.</Typography>
         </Box>
       </ThemeProvider>
     </>
