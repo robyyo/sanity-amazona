@@ -66,9 +66,10 @@ export default function ProductScreen(props) {
                 layout="responsive"
                 width={640}
                 height={640}
+                priority
               />
             </Grid>
-            <Grid md={3} xs={12}>
+            <Grid item md={3} xs={12}>
               <List>
                 <ListItem>
                   <Typography component="h1" variant="h1">
